@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Início - Igreja</title>
+    <title>Lista de Membros</title>
 </head>
 <body>
-    <h1>Bem-vindo ao Sistema da Igreja</h1>
-    <a href="/cadastro">Cadastrar Membro</a><br>
-    <a href="/listar">Listar Membros</a>
+    <h1>Membros da Igreja</h1>
+
+    <a href="{{ url_for('cadastro') }}">Cadastrar novo membro</a>
+
+    <ul>
+        {% for membro in membros %}
+            <li>{{ membro.nome }} - {{ membro.email }}</li>
+        {% else %}
+            <li>Nenhum membro cadastrado.</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
