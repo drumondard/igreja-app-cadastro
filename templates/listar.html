@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Membros</title>
+</head>
+<body>
+    <h2>Lista de Membros Cadastrados</h2>
+    <a href="/">Voltar</a>
+    <ul>
+        {% for membro in membros %}
+        <li>
+            <strong>{{ membro[1] }}</strong> - {{ membro[2] }} - {{ membro[3] }} - {{ membro[4] }} - {{ membro[5] }}
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
