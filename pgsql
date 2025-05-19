@@ -1,10 +1,7 @@
 cadastro_membros_igreja/
-│
 ├── app.py
-├── database.db (será criado automaticamente)
+├── requirements.txt 
 ├── templates/
 │   ├── index.html
 │   ├── cadastro.html
 │   └── listar.html
-└── static/
-    └── style.css (opcional)
