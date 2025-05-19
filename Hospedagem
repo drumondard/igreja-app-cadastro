@@ -1,0 +1,39 @@
+✅ Opção 1: Render (Hospedagem Gratuita com suporte a Flask)
+🔧 Passo a passo:
+1. Suba seu projeto no GitHub
+Crie uma conta em: https://github.com
+
+Crie um repositório novo
+
+Envie os arquivos do projeto (exceto database.db)
+
+2. Crie uma conta na Render
+Acesse: https://render.com
+
+Clique em "New" > "Web Service"
+
+Conecte com o GitHub e selecione o repositório
+
+3. Configure os detalhes do deploy:
+Name: cadastro-membros
+
+Runtime: Python
+
+Build Command: pip install -r requirements.txt
+
+Start Command: gunicorn app:app
+
+Environment: Python 3.x
+
+Port: Render usa automaticamente a variável de ambiente PORT – precisamos adaptar isso no código!
+
+4. Edite o app.py para usar a porta dinâmica:
+if __name__ == '__main__':
+    init_db()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+
+5. Crie o requirements.txt:
+flask
+gunicorn
+
