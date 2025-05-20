@@ -7,6 +7,7 @@ igreja-app-cadastro/
 │
 ├── templates/              # Arquivos HTML
 │   ├── login.html
+│   ├── admin_dashboard.html
 │   ├── cadastro.html
 │   └── lista.html
 │
