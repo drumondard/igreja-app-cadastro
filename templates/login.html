@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Login</title>
 </head>
 <body>
@@ -18,14 +18,11 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li style="color: {% if category == 'danger' %}red{% elif category == 'success' %}green{% else %}black{% endif %};">
-            {{ message }}
-          </li>
+        <ul style="color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
         {% endfor %}
         </ul>
       {% endif %}
