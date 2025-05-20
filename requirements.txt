@@ -1,4 +1,4 @@
 Flask
-psycopg2-binary
-SQLAlchemy
-flask-bcrypt
+Flask-SQLAlchemy
+Flask-Bcrypt
+gunicorn
