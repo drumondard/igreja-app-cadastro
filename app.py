@@ -1,63 +1,54 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import check_password_hash
-import os
-from models import db, User, Membro
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from models import db, User
+from forms import LoginForm, RegisterForm
+from config import Config
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.from_object(Config)
 
 db.init_app(app)
 
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+@app.route('/')
+def index():
+    return 'Página inicial'
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Cadastro realizado com sucesso.')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
-    if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password, request.form['password']):
-            session['user'] = user.username
-            return redirect(url_for('admin_dashboard'))
-        else:
-            error = 'Credenciais inválidas.'
-    return render_template('login.html', error=error)
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(url_for('index'))
+        flash('Usuário ou senha inválidos.')
+    return render_template('login.html', form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user', None)
+    logout_user()
     return redirect(url_for('login'))
-
-@app.route('/admin')
-def admin_dashboard():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('admin_dashboard.html', username=session['user'])
-
-@app.route('/cadastro', methods=['GET', 'POST'])
-def cadastro():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        nome = request.form['nome']
-        email = request.form['email']
-        telefone = request.form['telefone']
-        membro = Membro(nome=nome, email=email, telefone=telefone)
-        db.session.add(membro)
-        db.session.commit()
-        return redirect(url_for('listar'))
-
-    return render_template('cadastro.html')
-
-@app.route('/lista')
-def listar():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
-    membros = Membro.query.all()
-    return render_template('lista.html', membros=membros)
 
 if __name__ == '__main__':
     app.run(debug=True)
