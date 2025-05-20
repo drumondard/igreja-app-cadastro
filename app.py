@@ -1,54 +1,71 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from models import db, User
-from forms import LoginForm, RegisterForm
-from config import Config
+# app.py (ou seu arquivo principal)
+from flask import Flask, render_template, redirect, url_for, flash
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from forms import LoginForm
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.secret_key = 'sua_chave_secreta'
 
-db.init_app(app)
-
-login_manager = LoginManager(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Suponha que você tenha um modelo User que implemente os métodos do Flask-Login
+# Exemplo simplificado:
+class User:
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.password = password
+    
+    def is_active(self):
+        return True
+    
+    def get_id(self):
+        return self.id
+    
+    def is_authenticated(self):
+        return True
+    
+    def is_anonymous(self):
+        return False
+
+# Usuários exemplo
+users = {'usuario1': User(1, 'usuario1', 'senha123')}
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
-
-@app.route('/')
-def index():
-    return 'Página inicial'
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Cadastro realizado com sucesso.')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    for user in users.values():
+        if str(user.get_id()) == user_id:
+            return user
+    return None
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and user.check_password(form.password.data):
+        user = users.get(form.username.data)
+        if user and user.password == form.password.data:
             login_user(user)
+            flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
-        flash('Usuário ou senha inválidos.')
+        else:
+            flash('Usuário ou senha incorretos.', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
+    flash('Você saiu da sessão.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/')
+@login_required
+def index():
+    return f'Olá, {current_user.username}! Bem-vindo(a).'
 
 if __name__ == '__main__':
     app.run(debug=True)
