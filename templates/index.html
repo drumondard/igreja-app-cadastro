@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html>
-<head><title>Membros</title></head>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Membros da Igreja</title>
+</head>
 <body>
-    <h1>Lista de Membros</h1>
+    <h1>Cadastro de Membros</h1>
+    <form method="POST" action="/cadastrar">
+        <input type="text" name="nome" placeholder="Nome" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <h2>Lista de Membros</h2>
     <ul>
         {% for membro in membros %}
-            <li>{{ membro.nome }} ({{ membro.email }})</li>
+        <li>{{ membro.nome }} - {{ membro.email }}</li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('cadastro') }}">Novo Cadastro</a>
 </body>
 </html>
