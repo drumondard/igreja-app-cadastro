@@ -1,10 +1,17 @@
-cadastro_membros_igreja/
-├── app.py
-├── requirements.txt 
-├── templates/
-│   ├── index.html
+igreja-app-cadastro/
+│
+├── app.py                  # Arquivo principal do Flask
+├── models.py               # Modelos do banco de dados (User, etc.)
+├── criar_admin.py          # Script para criar o usuário admin
+├── requirements.txt        # Dependências do projeto
+│
+├── templates/              # Arquivos HTML
+│   ├── login.html
 │   ├── cadastro.html
-│   └── listar.html
+│   └── lista.html
+│
+└── static/                 # (Opcional) CSS, JS, imagens
+
 
 
 
