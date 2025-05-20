@@ -1,8 +1,13 @@
-<!doctype html>
-<html>
-<head><title>Admin Dashboard</title></head>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin</title>
+</head>
 <body>
-    <h1>Bem-vindo, administrador!</h1>
-    <a href="{{ url_for('logout') }}">Sair</a>
+    <h2>Bem-vindo, {{ username }}</h2>
+    <a href="{{ url_for('logout') }}">Sair</a> |
+    <a href="{{ url_for('cadastro') }}">Cadastrar Membro</a> |
+    <a href="{{ url_for('listar') }}">Listar Membros</a>
 </body>
 </html>
