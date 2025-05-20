@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
     <title>Lista de Membros</title>
 </head>
 <body>
-    <h2>Lista de Membros Cadastrados</h2>
-    <a href="/">Voltar</a>
+    <h2>Membros Cadastrados</h2>
     <ul>
         {% for membro in membros %}
-        <li>
-            <strong>{{ membro[1] }}</strong> - {{ membro[2] }} - {{ membro[3] }} - {{ membro[4] }} - {{ membro[5] }}
-        </li>
+            <li>{{ membro.nome }} - {{ membro.email }} - {{ membro.telefone }}</li>
         {% endfor %}
     </ul>
+    <a href="{{ url_for('admin_dashboard') }}">Voltar</a>
 </body>
 </html>
