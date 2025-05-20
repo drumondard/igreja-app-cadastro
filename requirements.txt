@@ -4,3 +4,4 @@ psycopg2-binary
 gunicorn
 werkzeug
 flask_login
+Flask-WTF==1.2.1
