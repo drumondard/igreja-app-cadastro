@@ -1,22 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Cadastro de Membros</title>
-</head>
+<head><title>Cadastro</title></head>
 <body>
-    <h1>Cadastrar Novo Membro</h1>
-
-    <form method="post" action="{{ url_for('cadastro') }}">
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome" required><br><br>
-
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
-
-        <button type="submit">Cadastrar</button>
+    <h1>Cadastrar Membro</h1>
+    <form method="POST">
+        Nome: <input type="text" name="nome"><br>
+        Email: <input type="email" name="email"><br>
+        <input type="submit" value="Cadastrar">
     </form>
-
-    <br>
-    <a href="{{ url_for('index') }}">Voltar para lista</a>
+    <a href="{{ url_for('index') }}">Voltar</a>
 </body>
 </html>
