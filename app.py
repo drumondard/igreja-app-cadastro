@@ -1,61 +1,63 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
+from werkzeug.security import check_password_hash
 import os
+from models import db, User, Membro
 
-# Inicialização do app
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))  # Melhor usar uma variável de ambiente para produção
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.secret_key = os.urandom(24)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializa as extensões
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
+db.init_app(app)
 
-# Modelo do usuário administrador
-class AdminUser(db.Model):
-    __tablename__ = 'admin_users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200), nullable=False)
-
-    def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
-
-    def set_password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-
-# Rota principal
-@app.route('/')
-def index():
-    return "Hello, Church Members!"
-
-# Login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
-        user = AdminUser.query.filter_by(username=request.form['username']).first()
-        if user and user.check_password(request.form['password']):
-            session['user_id'] = user.id
+        user = User.query.filter_by(username=request.form['username']).first()
+        if user and check_password_hash(user.password, request.form['password']):
+            session['user'] = user.username
             return redirect(url_for('admin_dashboard'))
-        flash('Credenciais inválidas.', 'danger')
-    return render_template('login.html')
+        else:
+            error = 'Credenciais inválidas.'
+    return render_template('login.html', error=error)
 
-# Dashboard
-@app.route('/admin')
-def admin_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('admin_dashboard.html')
-
-# Logout
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
-    flash('Você saiu da sessão.', 'info')
+    session.pop('user', None)
     return redirect(url_for('login'))
 
-# Execução local
+@app.route('/admin')
+def admin_dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('admin_dashboard.html', username=session['user'])
+
+@app.route('/cadastro', methods=['GET', 'POST'])
+def cadastro():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        telefone = request.form['telefone']
+        membro = Membro(nome=nome, email=email, telefone=telefone)
+        db.session.add(membro)
+        db.session.commit()
+        return redirect(url_for('listar'))
+
+    return render_template('cadastro.html')
+
+@app.route('/lista')
+def listar():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    membros = Membro.query.all()
+    return render_template('lista.html', membros=membros)
+
 if __name__ == '__main__':
     app.run(debug=True)
